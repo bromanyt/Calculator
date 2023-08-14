@@ -1,0 +1,116 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.mainButton {
+    background-color: #25A9B4;
+    color: white;
+    width: 50px;
+    margin-bottom: 3px;
+}
+
+    .mainButton:hover {
+        background-color: #0C8893;
+        color: white;
+    }
+
+#expressionTextArea {
+    font-size: 30px;
+    height: 60px;
+    width: 430px;
+    text-align: right;
+    text-align: end;
+}
+
+.longButton {
+    background-color: #25A9B4;
+    color: white;
+    margin-bottom: 3px;
+}
+
+    .longButton:hover {
+        background-color: #0C8893;
+        color: white;
+    }
+
+#historySelector {
+    width: 190px;
+    height: 25px;
+}
+
+#answerLabel {
+    font-size: large;
+}
+
+.box {
+    text-align: center;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    transition: opacity 500ms;
+    visibility: visible;
+    opacity: 1;
+}
+
+    .overlay:target {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+.wrapper {
+    margin: 70px auto;
+    padding: 20px;
+    background: #e7e7e7;
+    border-radius: 5px;
+    width: 400px;
+    position: relative;
+}
+
+    .wrapper h2 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .wrapper .close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 30px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+
+        .wrapper .close:hover {
+            color: #06D85F;
+        }
+
+    .wrapper .content {
+        max-height: 30%;
+        overflow: auto;
+    }

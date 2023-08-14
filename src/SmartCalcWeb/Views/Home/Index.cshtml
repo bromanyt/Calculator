@@ -1,0 +1,160 @@
+﻿@{
+    ViewData["Title"] = "Smart calculator";
+}
+@using sm4.SmartCalc.Model;
+@model CalculatorData
+
+<div class="text-center">
+    <h1 class="display-4"><b>SmartCalc v4</b></h1>
+    <div class="text-center">
+        <label id="answerLabel">
+            @if (@Model.Status == true)
+                {
+                <b>@Model.Answer</b>
+                }
+        </label>
+    </div>
+    <textarea readonly form="calculateForm" name="expression" id="expressionTextArea">@Model.CurrentExpression</textarea>
+</div>
+
+<div class="text-center">
+    <select id="historySelector" required>
+        <option selected="selected" value="zero"></option>
+        @foreach (string expression in Model.HistoryList)
+            {
+            <option>@expression</option>
+            }
+    </select>
+    <button class="longButton" name="addHistory" onclick="addFromHistory()">add expression</button>
+    <button class="longButton" name="clearHistory" onclick="location.href='/Home/ClearHistory'">clear history</button>
+</div>
+
+<script>function addFromHistory() {
+        let element = document.getElementById('historySelector');
+        let textArea = document.getElementById('expressionTextArea');
+        let expression = element.options[element.options.selectedIndex].textContent;
+        if (expression.search('=') > 0) {
+            textArea.textContent = expression.split('=')[0];
+        }
+        else {
+            textArea.textContent = expression;
+        }
+    }</script>
+
+<form id="calculateForm" method="post"></form>
+
+<div class="text-center">
+    <button class="mainButton" onclick="addToExpression('asin(')">asin</button>
+    <button class="mainButton" onclick="addToExpression('sin(')">sin</button>
+    <button class="mainButton" onclick="addToExpression('sqrt(')">√</button>
+    <button class="mainButton" onclick="addToExpression('1')">1</button>
+    <button class="mainButton" onclick="addToExpression('2')">2</button>
+    <button class="mainButton" onclick="addToExpression('3')">3</button>
+    <button class="mainButton" onclick="addToExpression('+')">+</button>
+    <button class="mainButton" onclick="cleanExpression()">C</button>
+</div>
+<div class="text-center">
+    <button class="mainButton" onclick="addToExpression('acos(')">acos</button>
+    <button class="mainButton" onclick="addToExpression('cos(')">cos</button>
+    <button class="mainButton" onclick="addToExpression('ln(')">ln</button>
+    <button class="mainButton" onclick="addToExpression('4')">4</button>
+    <button class="mainButton" onclick="addToExpression('5')">5</button>
+    <button class="mainButton" onclick="addToExpression('6')">6</button>
+    <button class="mainButton" onclick="addToExpression('-')">-</button>
+    <button class="mainButton" onclick="location.href='/Home/Help'">H</button>
+</div>
+<div class="text-center">
+    <button class="mainButton" onclick="addToExpression('atan(')">atan</button>
+    <button class="mainButton" onclick="addToExpression('tan(')">tan</button>
+    <button class="mainButton" onclick="addToExpression('log(')">log</button>
+    <button class="mainButton" onclick="addToExpression('7')">7</button>
+    <button class="mainButton" onclick="addToExpression('8')">8</button>
+    <button class="mainButton" onclick="addToExpression('9')">9</button>
+    <button class="mainButton" onclick="addToExpression('*')">∙</button>
+    <button class="mainButton" onclick="addToExpression('^')">^</button>
+</div>
+<div class="text-center">
+    <button class="mainButton" onclick="addToExpression('(')">(</button>
+    <button class="mainButton" onclick="addToExpression(')')">)</button>
+    <button class="mainButton" onclick="addToExpression('mod')">mod</button>
+    <button class="mainButton" onclick="addToExpression('0')">0</button>
+    <button class="mainButton" onclick="addToExpression('.')">.</button>
+    <button class="mainButton" onclick="addToExpression('E')">E</button>
+    <button class="mainButton" onclick="addToExpression('/')">÷</button>
+    <button class="mainButton" type="submit" form="calculateForm" formaction="/Home/Calculate/expression/x">=</button>
+</div>
+
+<div class="text-center">
+    <button id="buildGraphButton" class="longButton" style="width: 120px" form="calculateForm" formaction="/Home/BuildGraph/expression/xMin/xMax/yMin/yMax" type="submit">Build graph</button>
+    <button class="mainButton" name="asin" onclick="addToExpression('x')">x</button>
+    <input form="calculateForm" name="x" id="xValue" placeholder="0" value="0" type="number" step="any" style="width: 140px;" />
+</div>
+<div class="text-center">
+    <label>x min: </label>
+    <input id="xMin" name="xMin" form="calculateForm" value="@Model.GraphSize["xMin"]" type="number" style="width: 160px;" step="any" required />
+    <label>x max: </label>
+    <input id="xMax" name="xMax" form="calculateForm" value="@Model.GraphSize["xMax"]" type="number" style="width: 160px;" step="any" required />
+</div>
+<div class="text-center">
+    <label>y min: </label>
+    <input id="yMin" name="yMin" form="calculateForm" value="@Model.GraphSize["yMin"]" type="number" style="width: 160px;" step="any" required />
+    <label>y max: </label>
+    <input id="yMax" name="yMax" form="calculateForm" value="@Model.GraphSize["yMax"]" type="number" style="width: 160px;" step="any" required />
+</div>
+
+
+@{if (Model.CoordinateX is not null && Model.CoordinateX.Length > 0 && Model.CoordinateY is not null && Model.CoordinateY.Length > 0)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/Chart.js"></script>
+
+        <canvas id="lineChart" style="width:100%;max-width:1500px"></canvas>
+
+        <script>
+            const yValues = JSON.parse('@Html.Raw(Json.Serialize(Model.CoordinateY))')
+            const xValues = JSON.parse('@Html.Raw(Json.Serialize(Model.CoordinateX))')
+
+            const lineChart = new Chart("lineChart",
+            {
+                type: "line",
+
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        pointRadius: 0,
+                        fill: false,
+                        backgroundColor: "rgba(75, 192, 192, 0.4)",
+                        borderColor: "rgba(75, 192, 192)",
+                        pointBackgroundColor: "rgba(0,0,255,1)",
+                        spanGaps: false,
+                        data: yValues
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            max: @Model.GraphSize["yMax"],
+                            min: @Model.GraphSize["yMin"]
+                        }
+                    },
+                    plugins: {
+                        legend: false
+                    }
+                }
+            });
+        </script>
+    }
+}
+
+    @if (Model.Status == false)
+    {
+        <div class="overlay" id="error">
+            <div class="wrapper">
+                <h2>Error. Please try again.</h2>
+                <div class="content">
+                    <div class="container" style="text-align: center">
+                        <button class="mainButton" onclick="location.href='/Home/Index/@Model.CurrentExpression'">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
